@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}Team Rankings - HoopInsight{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="page-title">Team Rankings</h1>
+    <p class="lead mb-4">Explore the top-ranked NBA teams based on composite performance metrics including scoring, rebounding, assists, defense, and efficiency.</p>
+
+    {% if chart %}
+    <div class="card mb-5">
+        <div class="card-header">
+            <h5 class="mb-0">Composite Score Bar Chart</h5>
+        </div>
+        <div class="card-body text-center">
+            <img src="{{ chart }}" alt="Composite Ranking Chart" class="img-fluid rounded">
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Top 10 Teams by Composite Score</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Composite Score</th>
+                        <th>PTS</th>
+                        <th>REB</th>
+                        <th>AST</th>
+                        <th>STL</th>
+                        <th>BLK</th>
+                        <th>Turnovers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in top_teams %}
+                    <tr>
+                        <td>{{ team.Rank }}</td>
+                        <td>{{ team.Team }}</td>
+                        <td>{{ team.Composite | round(2) }}</td>
+                        <td>{{ team.PTS }}</td>
+                        <td>{{ team.REB }}</td>
+                        <td>{{ team.AST }}</td>
+                        <td>{{ team.STL }}</td>
+                        <td>{{ team.BLK }}</td>
+                        <td>{{ team.Turnovers }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

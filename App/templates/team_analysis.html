@@ -1,0 +1,307 @@
+{% extends "layout.html" %}
+
+{% block title %}Team Analysis - HoopInsight{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="page-title">Team Analysis</h1>
+    <p class="lead mb-5">
+        Analyze team performance, compare statistics to league averages, and get insights on team 
+        strengths and weaknesses. Our comprehensive analytics help you understand how teams perform 
+        across multiple dimensions.
+    </p>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Select Team for Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/team_analysis">
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Select Team</label>
+                            <select class="form-select" id="team" name="team" required>
+                                <option value="" selected disabled>Choose a team...</option>
+                                {% for team_code, team_name in teams %}
+                                <option value="{{ team_code }}" {% if selected_team == team_code %}selected{% endif %}>{{ team_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-chart-pie me-2"></i> Analyze Team
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3">Predict Matchup vs Another Team</h5>
+                    <form method="post" action="/team_analysis">
+                        <input type="hidden" name="team" value="{{ selected_team }}">
+                        <div class="mb-3">
+                            <label for="opponent" class="form-label">Select Opponent</label>
+                            <select class="form-select" id="opponent" name="opponent" required>
+                                <option value="" disabled selected>Choose opponent...</option>
+                                {% for code, name in teams %}
+                                    <option value="{{ code }}" {% if selected_opponent == code %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-crosshairs me-2"></i> Predict Outcome
+                        </button>
+                    </form>
+                    
+                    {% if prediction_result %}
+                    <div class="alert alert-success mt-4">
+                        <h6 class="mb-2">Matchup Prediction</h6>
+                        <p><strong>Predicted Point Margin:</strong> {{ prediction_result.margin }}</p>
+                        <p><strong>Win Probability:</strong> {{ prediction_result.win_prob }}%</p>
+                    </div>
+                    {% endif %}
+
+                    {% if gemini_report %}
+                    <div class="alert alert-warning mt-4">
+                        <h6 class="mb-2">AI Scouting Report</h6>
+                        <pre style="white-space: pre-wrap; font-family: var(--bs-font-monospace); font-size: 0.95rem;">{{ gemini_report }}</pre>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <h6>Team Rankings</h6>
+                        <div class="table-responsive team-rankings-table">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Team</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for team in team_data %}
+                                    <tr {% if selected_team == team.team_code %}class="highlight"{% endif %}>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ team.team_name }}</td>
+                                        <td>{{ team.composite_score }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            {% if team_stats %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ team_stats.team_name }} Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-12 mb-3">
+                            <h5>Team Record: {{ team_stats.losses }}-{{ team_stats.wins }}</h5>
+                            {% set win_percentage = (team_stats.losses / (team_stats.wins + team_stats.losses)) * 100 %}
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" data-width="{{ win_percentage }}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="stat-card position-relative">
+                                <div class="rank-badge">#{{ team_stats.ppg_rank }}</div>
+                                <div class="stat-value">{{ team_stats.ppg }}</div>
+                                <div class="stat-label">Points Per Game</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="stat-card position-relative">
+                                <div class="rank-badge">#{{ team_stats.oppg_rank }}</div>
+                                <div class="stat-value">{{ team_stats.oppg | round(1) }}</div>
+                                <div class="stat-label">Opponent PPG</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="stat-card position-relative">
+                                <div class="rank-badge">#{{ team_stats.fg_pct_rank }}</div>
+                                <div class="stat-value">{{ team_stats.fg_pct | round(1) }}%</div>
+                                <div class="stat-label">Field Goal %</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3">Team vs. League Average</h5>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Points Per Game</span>
+                            <span>{{ team_stats.ppg | round(1) }} vs {{ team_stats.league_avg.ppg | round(1) }}</span>
+                        </div>
+                        {% set team_ppg_width = (team_stats.ppg / 130) * 100 %}
+                        {% set league_ppg_width = (team_stats.league_avg.ppg / 130) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_ppg_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_ppg_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Opponent PPG</span>
+                            <span>{{ team_stats.oppg | round(1) }} vs {{ team_stats.league_avg.oppg | round(1) }}</span>
+                        </div>
+                        {% set team_oppg_width = (team_stats.oppg / 130) * 100 %}
+                        {% set league_oppg_width = (team_stats.league_avg.oppg / 130) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_oppg_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_oppg_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Field Goal %</span>
+                            <span>{{ team_stats.fg_pct | round(1) }}% vs {{ team_stats.league_avg.fg_pct | round(1) }}%</span>
+                        </div>
+                        {% set team_fg_width = (team_stats.fg_pct / 60) * 100 %}
+                        {% set league_fg_width = (team_stats.league_avg.fg_pct / 60) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_fg_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_fg_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>3-Point %</span>
+                            <span>{{ team_stats.three_pct | round(1) }}% vs {{ team_stats.league_avg.three_pct | round(1) }}%</span>
+                        </div>
+                        {% set team_three_width = (team_stats.three_pct / 50) * 100 %}
+                        {% set league_three_width = (team_stats.league_avg.three_pct / 50) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_three_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_three_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Rebounds</span>
+                            <span>{{ team_stats.reb }} vs {{ team_stats.league_avg.reb | round(1) }}</span>
+                        </div>
+                        {% set team_reb_width = (team_stats.reb / 60) * 100 %}
+                        {% set league_reb_width = (team_stats.league_avg.reb / 60) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_reb_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_reb_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-comparison">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Assists</span>
+                            <span>{{ team_stats.ast }} vs {{ team_stats.league_avg.ast | round(1) }}</span>
+                        </div>
+                        {% set team_ast_width = (team_stats.ast / 40) * 100 %}
+                        {% set league_ast_width = (team_stats.league_avg.ast / 40) * 100 %}
+                        <div class="stat-bar">
+                            <div class="stat-fill team-fill" data-width="{{ team_ast_width }}"></div>
+                            <div class="stat-fill league-fill" data-width="{{ league_ast_width }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <strong>Team Insight:</strong> The {{ team_stats.team_name }} are ranked 
+                        {% if team_stats.composite_score > 85 %}
+                        among the league's elite teams with exceptional 
+                        {% elif team_stats.composite_score > 75 %}
+                        as a solid playoff contender with strong
+                        {% else %}
+                        as a developing team with improving
+                        {% endif %}
+                        overall performance. They 
+                        {% if team_stats.ppg > team_stats.league_avg.ppg %}
+                        score above league average
+                        {% else %}
+                        may need to improve their offensive output
+                        {% endif %}
+                        and 
+                        {% if team_stats.oppg < team_stats.league_avg.oppg %}
+                        demonstrate good defensive capability
+                        {% else %}
+                        should focus on improving defensively
+                        {% endif %}
+                        compared to league standards.
+                    </div>
+                </div>
+            </div>
+            {% if team_graphs %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Team Graphs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6>Composite Performance Ranking</h6>
+                        <img src="{{ team_graphs.composite }}" class="img-fluid mb-3" alt="Composite Graph">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Points vs Composite Score (Scatter)</h6>
+                        <img src="{{ team_graphs.scatter }}" class="img-fluid mb-3" alt="Scatter Graph">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Radar Chart</h6>
+                        <img src="{{ team_graphs.radar }}" class="img-fluid mb-3" alt="Radar Chart">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Parallel Coordinates</h6>
+                        <img src="{{ team_graphs.parallel }}" class="img-fluid mb-3" alt="Parallel Chart">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Heat Map</h6>
+                        <img src="{{ team_graphs.heatmap }}" class="img-fluid mb-3" alt="Heat Map">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Game-by-Game Point Differential</h6>
+                        <img src="{{ team_graphs.game_performance }}" class="img-fluid" alt="Game Performance">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-chart-pie fa-4x text-primary"></i>
+                    </div>
+                    <h4>Select a Team for Analysis</h4>
+                    <p class="text-muted">
+                        Choose a team from the dropdown menu to view comprehensive team statistics, rankings, and insights.
+                    </p>
+                    <p class="mb-0">
+                        Our analytics platform provides detailed comparisons to league averages and identifies team 
+                        strengths and improvement areas.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-width]').forEach(function(element) {
+            var width = element.getAttribute('data-width');
+            element.style.width = width + '%';
+        });
+    });
+</script>
+{% endblock %}

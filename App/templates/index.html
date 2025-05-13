@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block title %}HoopInsight - Basketball Analytics Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Basketball Analytics Platform</h1>
+        <p class="lead mb-4">Data-driven insights for fantasy teams, betting evaluation, and coaching strategies</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="/player_scouting" class="btn btn-secondary btn-lg">Try Player Scouting</a>
+            <a href="/team_analysis" class="btn btn-outline-light btn-lg">Analyze Teams</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 section-title">Our Analytics Features</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-user-chart me-2"></i>Player Scouting</h3>
+                    <p>Get AI-powered scouting reports on player performance against specific teams. Our Ridge Regression model analyzes historical matchups to predict performance.</p>
+                    <div class="mt-auto">
+                        <a href="/player_scouting" class="btn btn-primary">Try It</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-chart-pie me-2"></i>Team Analysis</h3>
+                    <p>Compare teams across multiple dimensions with detailed statistics. Visualize team performance relative to league averages and identify strengths and weaknesses.</p>
+                    <div class="mt-auto">
+                        <a href="/team_analysis" class="btn btn-primary">Try It</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-users me-2"></i>Fantasy Builder</h3>
+                    <p>Build optimal fantasy teams with advanced analytics and matchup analysis. Maximize your fantasy points with data-driven insights and player rankings.</p>
+                    <div class="mt-auto">
+                        <a href="#" class="btn btn-primary">Coming Soon</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-chart-line me-2"></i>Bet Evaluator</h3>
+                    <p>Analyze betting opportunities with expected value calculations and win probability models. Find the best value picks based on our predictive analytics.</p>
+                    <div class="mt-auto">
+                        <a href="#" class="btn btn-primary">Coming Soon</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-clipboard me-2"></i>Coach Strategy</h3>
+                    <p>Get AI-powered coaching recommendations for lineup optimization, defensive adjustments, and offensive strategies based on opponent analysis.</p>
+                    <div class="mt-auto">
+                        <a href="#" class="btn btn-primary">Coming Soon</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box d-flex flex-column">
+                    <h3><i class="fas fa-bullseye me-2"></i>Shot Analysis</h3>
+                    <p>Visualize shooting patterns, identify hot zones, and analyze shot selection efficiency to optimize offensive strategies and player development.</p>
+                    <div class="mt-auto">
+                        <a href="#" class="btn btn-primary">Coming Soon</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="section-title">About Our Project</h2>
+                <p>HoopInsight was developed by a team of data scientists and basketball enthusiasts who are passionate about bringing advanced analytics to basketball fans, fantasy players, bettors, and coaches.</p>
+                <p>Our platform combines cutting-edge machine learning models, interactive visualizations, and comprehensive data analysis to provide actionable insights that can help you make better decisions.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="#" class="btn btn-primary">Meet Our Team</a>
+                    <a href="#" class="btn btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Our Team</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">AS</div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Arnik Shah</h6>
+                                        <p class="text-muted mb-0">Data Collection, ML Models</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">BZ</div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Ben Zaslavsky</h6>
+                                        <p class="text-muted mb-0">Team Analysis, Visualizations</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">TC</div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Teddy Crockett</h6>
+                                        <p class="text-muted mb-0">Classification Models</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">IE</div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Isabel Elmann</h6>
+                                        <p class="text-muted mb-0">Interactive Visualizations</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">RJ</div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Ramish Jalil</h6>
+                                        <p class="text-muted mb-0">Team Matchup Predictions</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Getting Started Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 section-title">Getting Started</h2>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="list-group">
+                    <a href="/player_scouting" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-user-chart me-3 text-primary"></i>
+                            Generate Player Scouting Report
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="/team_analysis" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-chart-pie me-3 text-primary"></i>
+                            Analyze Team Performance
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-users me-3 text-primary"></i>
+                            Build Fantasy Team
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-chart-line me-3 text-primary"></i>
+                            Evaluate Betting Opportunities
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-clipboard me-3 text-primary"></i>
+                            Get Coaching Recommendations
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

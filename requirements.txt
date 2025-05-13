@@ -1,0 +1,15 @@
+
+flask
+seaborn
+kaleido
+matplotlib
+numpy
+pandas
+sqlalchemy
+plotly
+google-generativeai
+scikit-learn
+# MUST INSTALL SQL: brew install mysql pkg-config
+mysqlclient
+pymysql
+ngrok config add-authtoken 2wyA3n667aUo8jySIwHjVw6aE9W_4hoxecZga6mGKyRDCEUzb

@@ -1,0 +1,231 @@
+{% extends "layout.html" %}
+
+{% block title %}Player Scouting Reports - HoopInsight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analysis-section {
+        white-space: pre-line;
+        line-height: 1.7;
+    }
+    
+    .historical-stat {
+        font-weight: 600;
+        color: #ea580c;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="page-title">Player Scouting Reports</h1>
+    <p class="lead mb-5">
+        Generate comprehensive scouting reports using our machine learning model to predict player performance 
+        against specific teams. Our Ridge Regression algorithm analyzes historical matchups to provide 
+        accurate predictions and actionable insights.
+    </p>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Generate Scouting Report</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/player_scouting">
+                        <div class="mb-3">
+                            <label for="player" class="form-label">Select Player</label>
+                            <select class="form-select" id="player" name="player" required>
+                                <option value="" selected disabled>Choose a player...</option>
+                                {% for player in players %}
+                                <option value="{{ player }}" {% if selected_player == player %}selected{% endif %}>{{ player }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Select Opponent Team</label>
+                            <select class="form-select" id="team" name="team" required>
+                                <option value="" selected disabled>Choose a team...</option>
+                                {% for team_code, team_name in teams %}
+                                <option value="{{ team_code }}" {% if selected_team == team_code %}selected{% endif %}>{{ team_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stat" class="form-label">Select Statistic</label>
+                            <select class="form-select" id="stat" name="stat" required>
+                                <option value="" selected disabled>Choose a stat...</option>
+                                {% for s in ['PTS', 'REB', 'AST', 'STL', 'BLK'] %}
+                                <option value="{{ s }}" {% if stat == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-file-chart-line me-2"></i> Generate Report
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <h6 class="mt-4 mb-3">How It Works</h6>
+                    <ol class="small">
+                        <li class="mb-2">We use Ridge Regression to analyze the player's historical performance against the selected team.</li>
+                        <li class="mb-2">The model considers factors like team defensive rating, pace, and matchup history.</li>
+                        <li class="mb-2">Predictions are generated for key stats like points, rebounds, and assists.</li>
+                        <li>The AI integrates these predictions with team analysis to create a comprehensive scouting report.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            {% if scouting_report %}
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Scouting Report</h5>
+                    <span class="badge bg-primary">{{ scouting_report.player_name }} vs {{ scouting_report.opponent_name }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center mb-4">
+                        <div class="text-center me-4">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 64px; height: 64px; color: white; font-weight: bold;">
+                                {{ scouting_report.player_name[:1] }}{{ scouting_report.player_name.split()[1][:1] }}
+                            </div>
+                            <div class="fw-bold">{{ scouting_report.player_name }}</div>
+                            <div class="small text-muted">{{ scouting_report.player_team }}</div>
+                        </div>
+                        
+                        <div class="mx-4 fs-5 fw-bold">vs</div>
+                        
+                        <div class="text-center ms-4">
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 64px; height: 64px; color: white; font-weight: bold;">
+                                {{ scouting_report.opponent_team }}
+                            </div>
+                            <div class="fw-bold">{{ scouting_report.opponent_name }}</div>
+                            <div class="small text-muted">Upcoming Matchup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="prediction-card">
+                                <div class="prediction-value">{{ scouting_report.predicted_points }}</div>
+                                <div class="prediction-label">Predicted Points</div>
+                                {% if scouting_report.historical_avg %}
+                                <div class="mt-2 small">Historical: <span class="historical-stat">{{ scouting_report.historical_avg }}</span></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="prediction-card">
+                                <div class="prediction-value">{{ scouting_report.predicted_rebounds }}</div>
+                                <div class="prediction-label">Predicted Rebounds</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="prediction-card">
+                                <div class="prediction-value">{{ scouting_report.predicted_assists }}</div>
+                                <div class="prediction-label">Predicted Assists</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section mb-4">
+                        <h5 class="mb-3">Analysis</h5>
+                        <div class="p-3 bg-light rounded">
+                            {{ scouting_report.analysis }}
+                        </div>
+                    </div>
+
+                    {% if gemini_report %}
+                    <div class="analysis-section mb-4">
+                        <h5 class="mb-3">AI-Generated Scouting Report</h5>
+                        <div class="p-3 bg-light rounded">
+                            <pre style="white-space: pre-wrap;">{{ gemini_report }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+            
+            <!-- Charts -->
+            {% if performance_chart or player_scatter or player_density or time_series %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Player Performance Visualizations</h5>
+                </div>
+                <div class="card-body">
+                    {% if performance_chart %}
+                    <div class="mb-4">
+                        <h6 class="text-center">PTS / REB / AST Over Time</h6>
+                        <img src="{{ performance_chart }}" class="img-fluid rounded mb-3" alt="Performance Chart">
+                    </div>
+                    {% endif %}
+
+                    {% if player_scatter %}
+                    <div class="mb-4">
+                        <h6 class="text-center">Scatter Plot – {{ stat }}</h6>
+                        <img src="{{ player_scatter }}" class="img-fluid rounded mb-3" alt="Scatter Plot">
+                    </div>
+                    {% endif %}
+
+                    {% if player_density %}
+                    <div class="mb-4">
+                        <h6 class="text-center">Density Plot – {{ stat }}</h6>
+                        <img src="{{ player_density }}" class="img-fluid rounded mb-3" alt="Density Plot">
+                    </div>
+                    {% endif %}
+
+                    {% if time_series %}
+                    <div class="mb-4">
+                        <h6 class="text-center">Rolling Median – {{ stat }}</h6>
+                        <div class="border rounded p-3 shadow-sm">
+                            {{ time_series | safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-basketball fa-4x text-primary"></i>
+                    </div>
+                    <h4>Generate Your First Scouting Report</h4>
+                    <p class="text-muted">
+                        Select a player and an opponent team from the form to generate a comprehensive scouting report with
+                        performance predictions, historical analysis, and strategic insights.
+                    </p>
+                    <p class="mb-0">
+                        Our machine learning model analyzes player-team matchups to provide accurate predictions based on
+                        historical data and team defensive metrics.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- {% block extra_js %}
+{% if performance_chart %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Using JSON.parse to ensure proper JavaScript syntax
+        var graphJSON = JSON.parse('{{ performance_chart|safe }}');
+        Plotly.newPlot('performance-chart', graphJSON.data, graphJSON.layout);
+    });
+</script>
+{% endif %}
+{% endblock %} -->
